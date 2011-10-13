@@ -1,0 +1,15 @@
+= DESCRIPTION:
+
+Installs Ruby and related packages.
+
+= REQUIREMENTS:
+
+== Platform:
+
+Tested on CentOS 5.6 64-bit.
+
+= ATTRIBUTES:
+
+* +languages[:ruby][:default_version]+ - The Ruby version to install with the ruby recipe and create symlinks for with the symlinks recipe.
+
+= USAGE:
