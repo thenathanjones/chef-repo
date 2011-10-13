@@ -1,2 +1,4 @@
 .chef/*
 client-config/*
+*.DS_Store
+
