@@ -58,7 +58,11 @@ Vagrant::Config.run do |config|
     chef.add_role "appserver"
   
     # You may also specify custom JSON attributes:
-    chef.json = { :languages => :ruby => :default_version => "1.9.2-p290" }
+    chef.json.merge!({ 
+      :languages => {
+        :ruby => {:default_version => "1.9.2-p290"}
+      }
+    })
   end
 
   # Enable provisioning with chef server, specifying the chef server URL,

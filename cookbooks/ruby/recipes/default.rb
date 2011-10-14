@@ -17,4 +17,4 @@
 # limitations under the License.
 #
 
-ruby_packages node[:languages][:ruby][:default_version] || "1.8.7-p72"
+ruby_source node[:languages][:ruby][:default_version] || "1.8.7-p72"
