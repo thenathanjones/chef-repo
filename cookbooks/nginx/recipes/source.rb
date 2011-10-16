@@ -44,8 +44,7 @@ node.set[:nginx][:configure_flags] = [
   "--prefix=#{node[:nginx][:install_path]}",
   "--conf-path=#{node[:nginx][:dir]}/nginx.conf",
   "--with-http_ssl_module",
-  "--with-http_gzip_static_module",
-  "--with-http_stub_status_module"
+  "--with-http_gzip_static_module"
 ]
 
 configure_flags = node[:nginx][:configure_flags].join(" ")

@@ -1,5 +1,5 @@
 define :ruby_source, :action => :install do
-  ruby_version = "ruby-#{params[:name].to_s}"
+  ruby_version = "ruby-#{params[:version].to_s}-#{params[:patch_level]}"
   ruby_major_version = ruby_version.match(/(\d).(\d)/).to_s
   ruby_download_path = "#{ruby_version}.tar.gz"
   ruby_download = "/tmp/#{ruby_download_path}"
@@ -15,6 +15,7 @@ define :ruby_source, :action => :install do
     ./configure --with-openssl-dir=/usr/lib/openssl ; make
     make install
     EOH
+    not_if "ruby -v | grep \"#{params[:version]}\" | grep \"#{params[:patch_level]}\""
   end
   bash "replace system ruby" do
     code <<-EOH

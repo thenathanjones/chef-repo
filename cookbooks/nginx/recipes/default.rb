@@ -20,12 +20,6 @@
 
 package "nginx"
 
-directory node[:nginx][:log_dir] do
-  mode 0755
-  owner node[:nginx][:user]
-  action :create
-end
-
 %w{nxensite nxdissite}.each do |nxscript|
   template "/usr/sbin/#{nxscript}" do
     source "#{nxscript}.erb"
@@ -43,19 +37,27 @@ template "nginx.conf" do
   mode 0644
 end
 
-template "#{node[:nginx][:dir]}/sites-available/default" do
+directory "#{node[:nginx][:dir]}/sites-enabled" do
+  mode 0755
+  owner "root"
+  group "root"
+  action :create
+end
+
+template "#{node[:nginx][:dir]}/sites-enabled/default" do
   source "default-site.erb"
   owner "root"
   group "root"
   mode 0644
 end
 
+directory node[:nginx][:log_dir] do
+  mode 0755
+  owner node[:nginx][:user]
+  action :create
+end
+
 service "nginx" do
   supports :status => true, :restart => true, :reload => true
   action [ :enable, :start ]
-end
-
-#no default site
-nginx_site :default do
-  enable false
 end

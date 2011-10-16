@@ -2,10 +2,10 @@ name "appserver"
 description "ruby app server"
 
 #placeholder role
-run_list "recipe[ruby]"
+run_list "recipe[unicorn_nginx]"
 
 # Attributes applied if the node doesn't have it set already.
-#default_attributes()
+default_attributes()
 
 # Attributes applied no matter what the node has set already.
-#override_attributes()
+override_attributes()

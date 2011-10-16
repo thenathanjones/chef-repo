@@ -17,4 +17,8 @@
 # limitations under the License.
 #
 
-ruby_source node[:languages][:ruby][:default_version] || "1.8.7-p72"
+ruby_source "Ruby install" do
+  implementation node[:ruby][:implementation]
+  version node[:ruby][:version]
+  patch_level node[:ruby][:patch_level]
+end
