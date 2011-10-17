@@ -66,6 +66,6 @@ server {
   # Rails error pages
   error_page 500 502 503 504 /500.html;
   location = /500.html {
-    root <%= node[:nginx][:working_dir] %>/<%= node[:app_name] %>/current/public" %>;
+    root <%= node[:nginx][:working_dir] %>/<%= node[:app_name] %>/current/public;
   }
 }
