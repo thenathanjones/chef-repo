@@ -26,19 +26,38 @@ package 'sqlite-devel'
 
 gem_package 'rails'
 
-directory "/var/www" do
+# create the directory the app will be deployed to
+directory "#{node[:nginx][:working_dir]}" do
   mode 0755
   owner "#{node[:nginx][:user]}"
   group "#{node[:nginx][:group]}"
 end
 
-port_setup = {8080 => {:tcp_nopush => true}, "'/tmp/.sock'" => {:backlog => 64}}
-unicorn_config "/etc/unicorn" do
-  working_directory "/var/www"
+# override the existing template with one configured for unicorn
+template "#{node[:nginx][:dir]}/sites-enabled/default" do
+  source "default-site.erb"
+  owner "root"
+  group "root"
+  mode 0644
+end
+
+# include more config from the unicorn version of the nginx.conf file
+template "#{node[:nginx][:dir]}/conf.d/upstream.conf" do
+  source "upstream.conf.erb"
+  owner "root"
+  group "root"
+  mode 0644
+end
+
+# create a unicorn config to match
+port_setup = {"'/tmp/.sock'" => {:backlog => 64}}
+deploy_dir = "#{node[:nginx][:working_dir]}/#{node[:app_name]/current"
+unicorn_config "#{deploy_dir}/conf/unicorn.rb" do
+  working_directory "#{deploy_dir}"
   listen port_setup
   owner "#{node[:nginx][:user]}"
   group "#{node[:nginx][:group]}"
-  pid "/var/www/unicorn/tmp/pid/unicorn.pid"
-  stderr_path "/var/www/unicorn/unicorn.error.log"
-  stdout_path "/var/www/unicorn/unicorn.out.log"
+  pid "/var/run/unicorn.pid"
+  stderr_path "/var/log/unicorn/error.log"
+  stdout_path "/var/log/unicorn/out.log"
 end

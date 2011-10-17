@@ -58,6 +58,7 @@ Vagrant::Config.run do |config|
       chef.cookbooks_path = "cookbooks"
       chef.roles_path = "roles"
       chef.add_role "appserver"
+      chef.add_role "dbserver"
     
       # You may also specify custom JSON attributes:
       chef.json.merge!({ 
@@ -68,8 +69,13 @@ Vagrant::Config.run do |config|
           },
         :nginx => {
           :user => "nginx",
-          :group => "nginx"
-        }
+          :group => "nginx",
+          :working_dir => "/var/www"
+        },
+        :mysql => {
+          :server_root_password => "password"
+        },
+        :app_name => "unicorn"
       })
   end
 
