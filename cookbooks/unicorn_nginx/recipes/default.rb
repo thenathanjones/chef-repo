@@ -20,6 +20,21 @@ include_recipe "ruby"
 
 include_recipe "nginx"
 
+packages = ["libxml2-devel", "libxslt-devel"]
+packages.each do |p|
+  package "#{p}" do
+    action :install
+  end
+end
+
+# create a user for running the application
+user "#{node[:app][:user]}" do
+  comment "User for #{node[:app][:name]}"
+  gid "#{node[:nginx][:group]}"
+  home "/home/#{node[:app][:user]}"
+  shell "/bin/bash"
+end
+
 # create the base directory the app will be deployed to
 directory "#{node[:nginx][:working_dir]}" do
   mode 0755
@@ -44,10 +59,10 @@ template "#{node[:nginx][:dir]}/conf.d/upstream.conf" do
 end
 
 # ensure the directory to deploy the app to is there
-deploy_dir = "#{node[:nginx][:working_dir]}/#{node[:app_name]}"
+deploy_dir = "#{node[:nginx][:working_dir]}/#{node[:app][:name]}"
 directory "#{deploy_dir}" do
   mode 0755
-  owner "#{node[:nginx][:user]}"
+  owner "#{node[:app][:user]}"
   group "#{node[:nginx][:group]}"
   action :create
   recursive true
@@ -57,7 +72,7 @@ end
 unicorn_log_dir = "/var/log/unicorn"
 directory "#{unicorn_log_dir}" do
   mode 0755
-  owner "#{node[:nginx][:user]}"
+  owner "#{node[:app][:user]}"
   group "#{node[:nginx][:group]}"
 end
 

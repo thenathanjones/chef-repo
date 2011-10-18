@@ -75,7 +75,9 @@ Vagrant::Config.run do |config|
         :mysql => {
           :server_root_password => "password"
         },
-        :app_name => "unicorn"
+        :app => {
+          :name => "gaia"
+         }
       })
   end
 
