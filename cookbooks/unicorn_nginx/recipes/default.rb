@@ -20,13 +20,7 @@ include_recipe "ruby"
 
 include_recipe "nginx"
 
-include_recipe "unicorn"
-
-package 'sqlite-devel'
-
-gem_package 'rails'
-
-# create the directory the app will be deployed to
+# create the base directory the app will be deployed to
 directory "#{node[:nginx][:working_dir]}" do
   mode 0755
   owner "#{node[:nginx][:user]}"
@@ -49,6 +43,16 @@ template "#{node[:nginx][:dir]}/conf.d/upstream.conf" do
   mode 0644
 end
 
+# ensure the directory to deploy the app to is there
+deploy_dir = "#{node[:nginx][:working_dir]}/#{node[:app_name]}"
+directory "#{deploy_dir}" do
+  mode 0755
+  owner "#{node[:nginx][:user]}"
+  group "#{node[:nginx][:group]}"
+  action :create
+  recursive true
+end
+
 # ensure the log directory for unicorn is created
 unicorn_log_dir = "/var/log/unicorn"
 directory "#{unicorn_log_dir}" do
@@ -57,15 +61,9 @@ directory "#{unicorn_log_dir}" do
   group "#{node[:nginx][:group]}"
 end
 
-# create a unicorn config to match
-port_setup = {"'/tmp/.sock'" => {:backlog => 64}}
-deploy_dir = "#{node[:nginx][:working_dir]}/#{node[:app_name]}/current"
-unicorn_config "#{deploy_dir}/config/unicorn.rb" do
-  working_directory "#{deploy_dir}"
-  listen port_setup
-  owner "#{node[:nginx][:user]}"
-  group "#{node[:nginx][:group]}"
-  pid "/var/run/unicorn.pid"
-  stderr_path "#{unicorn_log_dir}/error.log"
-  stdout_path "#{unicorn_log_dir}/out.log"
+# install bundler and let the app deal with its own gems
+bash "install bundler" do
+  code <<-EOH
+  gem install bundler --no-rdoc --no-ri
+  EOH
 end

@@ -22,3 +22,10 @@ ruby_source "Ruby install" do
   version node[:ruby][:version]
   patch_level node[:ruby][:patch_level]
 end
+
+# ensure chef is there as we have now changed version
+bash "re-install chef for the new ruby" do
+  code <<-EOH
+  gem install chef --no-rdoc --no-ri
+  EOH
+end
