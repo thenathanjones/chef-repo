@@ -28,11 +28,28 @@ packages.each do |p|
 end
 
 # create a user for running the application
+user_home = "/home/#{node[:app][:user]}"
 user "#{node[:app][:user]}" do
   comment "User for #{node[:app][:name]}"
   gid "#{node[:nginx][:group]}"
-  home "/home/#{node[:app][:user]}"
+  home "#{user_home}"
   shell "/bin/bash"
+end
+
+# create the .ssh directory for keys
+ssh_directory = "#{user_home}/.ssh"
+directory "#{ssh_directory}" do
+  mode 0700
+  owner "#{node[:app][:user]}"
+  group "#{node[:nginx][:group]}"
+end
+
+# add a specific set of keys to the authorized_keys file for logons
+template "#{ssh_directory}/authorized_keys" do
+  source "authorized_keys.erb"
+  owner "#{node[:app][:user]}"
+  group "#{node[:nginx][:group]}"
+  mode 0600
 end
 
 # create the base directory the app will be deployed to
@@ -65,10 +82,9 @@ directory "#{deploy_dir}" do
   owner "#{node[:app][:user]}"
   group "#{node[:nginx][:group]}"
   action :create
-  recursive true
 end
 
-# ensure the log directory for unicorn is created
+# ensure the log directory for unicorn is created and accessible
 unicorn_log_dir = "/var/log/unicorn"
 directory "#{unicorn_log_dir}" do
   mode 0755
