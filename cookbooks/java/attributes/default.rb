@@ -1,7 +1,7 @@
 #
 # Cookbook Name:: go
-# Recipe:: agent
 # Author:: Nathan Jones (thenathanjones@gmail.com)
+# Adapted from Java Cookbook from Opscode
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,27 +16,11 @@
 # limitations under the License.
 #
 
-include_recipe "java"
+default[:java][:flavor] = "sunjdk"
 
-package "go-server" do
-  case node[:platform]
-    when "centos","redhat","fedora"
-      source "http://download01.thoughtworks.com/go/2.3.1/ga/go-agent-2.3.1-14065.noarch.rpm"
-    else
-      source "http://download01.thoughtworks.com/go/2.3.1/ga/go-agent-2.3.1-14065.deb"
-    end
-end
-
-# template go-agent config
-template "/etc/default/go-agent" do
-  source "go-agent.erb"
-  owner "go"
-  group "go"
-  mode "0644"
-end
-
-template_go_config
-
-service "go-agent" do
-  action :restart
+case platform
+when "centos","redhat","fedora"
+  set[:java][:java_home] = "/usr/lib/jvm/java"
+else
+	set[:java][:java_home] = "/usr/lib/jvm/default-java"
 end

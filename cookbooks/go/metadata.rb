@@ -12,6 +12,6 @@ recipe "go::agent", "Installs Go Agent"
   supports os
 end
 
-%w{ nginx }.each do |cb|
+%w{ java }.each do |cb|
   depends cb
 end

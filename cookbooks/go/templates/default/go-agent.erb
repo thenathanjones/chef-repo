@@ -6,5 +6,5 @@ AGENT_WORK_DIR=/var/lib/go-agent
 export AGENT_WORK_DIR
 DAEMON=Y
 VNC=N
-JAVA_HOME=/usr/lib/jvm/java-6-sun
+JAVA_HOME=<%= node[:java][:java_home] %>
 export JAVA_HOME

@@ -8,10 +8,6 @@ define :template_go_config, :action => :install do
     source "pipelines.xml.erb"
   end
   
-  template "/tmp/windows-agent.xml" do
-    source "windows-agent.xml.erb"
-  end
-  
   ruby_block "update Go config" do
     block do
       GoHelper.template_config
