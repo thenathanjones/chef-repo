@@ -92,6 +92,11 @@ directory "#{unicorn_log_dir}" do
   group "#{node[:nginx][:group]}"
 end
 
+# restart nginx to pick up the new config
+service "nginx" do
+  action :restart
+end
+
 # install bundler and let the app deal with its own gems
 bash "install bundler" do
   code <<-EOH

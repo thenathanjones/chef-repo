@@ -10,6 +10,6 @@ recipe "unicorn_nginx", "Installs nginx and unicorn packages and sets up configu
   supports os
 end
 
-%w{ nginx unicorn }.each do |cb|
+%w{ nginx }.each do |cb|
   depends cb
 end
