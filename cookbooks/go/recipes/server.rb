@@ -67,7 +67,9 @@ template "/etc/default/go-server" do
   mode "0644"
 end
 
-template_go_config
+template_go_config do
+  config node[:go]
+end
 
 service "go-server" do
   action :restart

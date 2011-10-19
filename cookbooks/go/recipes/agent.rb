@@ -57,8 +57,6 @@ template "/etc/default/go-agent" do
   mode "0644"
 end
 
-template_go_config
-
 service "go-agent" do
   action :restart
 end

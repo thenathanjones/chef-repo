@@ -1,5 +1,13 @@
 define :template_go_config, :action => :install do
   
+  required_nokogiri_packages = ["libxml2","libxml2-devel","libxslt","libxslt-devel"]
+  required_nokogiri_packages.each do |package_name|
+    package "#{package_name}"
+  end
+    
+  gem_package "nokogiri"
+  Gem.clear_paths
+  
   template "/tmp/license.xml" do
     source "license.xml.erb"
   end
@@ -10,28 +18,39 @@ define :template_go_config, :action => :install do
   
   ruby_block "update Go config" do
     block do
-      GoHelper.template_config
+      GoHelper.template_config params[:config]
     end
   end
 end
 
 class GoHelper
   
-  def self.template_config
+  def self.template_config config
     require 'rubygems'
     require 'nokogiri'
     
     filename = "/etc/go/cruise-config.xml"
     input = Nokogiri::XML(File.new(filename))
-    
-    input.root['schemaVersion'] = '24'
 
-    input.root.xpath("//license").remove
     server_section = input.root.xpath("//server")
-    new_license_section = Nokogiri::XML(File.new("/tmp/license.xml"))
-    input.root.xpath("//server").first.add_child new_license_section.root
+    if (!server_section.any?) 
+      input.root.add_child("<server artifactsdir=\"artifacts\"></server>")
+    end
+      
+    # Go Community doesn't require a license, so only template this if provided
+    license_section = input.root.xpath("//license")
+    if (license_section.any?) 
+      license_section.remove
+    end
+    if (config && config[:license_key])
+      new_license_section = Nokogiri::XML(File.new("/tmp/license.xml"))
+      input.root.xpath("//server").first.add_child new_license_section.root
+    end
 
-    input.root.xpath("//pipelines").remove
+    pipelines_section = input.root.xpath("//pipelines")
+    if (pipelines_section.any?) 
+      pipelines_section.remove
+    end
     pipelines_section = Nokogiri::XML(File.new("/tmp/pipelines.xml"))
     input.root.add_child pipelines_section.root
 

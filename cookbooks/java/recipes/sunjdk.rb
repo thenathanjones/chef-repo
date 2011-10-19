@@ -28,8 +28,8 @@ when "centos","redhat","fedora"
     not_if "test -f #{jdk_download}"
   end
   
-  package "jdk" do
-    source "#{jdk_download}"
+  execute "jdk install" do
+    command "yum -d0 -e0 -y localinstall #{jdk_download} --nogpgcheck"
   end
 else
   raise "Platform not supported...yet"
