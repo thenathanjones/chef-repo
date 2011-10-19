@@ -16,11 +16,21 @@
 # limitations under the License.
 #
 
-package "go-server" do
-  case node[:platform]
-    when "centos","redhat","fedora"
-      source "http://download.oracle.com/otn-pub/java/jdk/7/jdk-7-linux-i586.rpm"
-    else
-      source ""
-    end
+case node[:platform]
+when "centos","redhat","fedora"
+  package_name = "jdk-7-linux-i586.rpm"
+  jdk_download = "/tmp/#{package_name}"
+  remote_file jdk_download do
+    source "http://download.oracle.com/otn-pub/java/jdk/7/#{package_name}"
+    mode "0644"
+    owner "#{ENV['USER']}"
+    group "#{ENV['USER']}"
+    not_if "test -f #{jdk_download}"
+  end
+  
+  package "jdk" do
+    source "#{jdk_download}"
+  end
+else
+  raise "Platform not supported...yet"
 end

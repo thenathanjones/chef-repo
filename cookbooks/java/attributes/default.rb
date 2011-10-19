@@ -20,7 +20,7 @@ default[:java][:flavor] = "sunjdk"
 
 case platform
 when "centos","redhat","fedora"
-  set[:java][:java_home] = "/usr/lib/jvm/java"
+  set[:java][:java_home] = "/usr/java/default"
 else
 	set[:java][:java_home] = "/usr/lib/jvm/default-java"
 end

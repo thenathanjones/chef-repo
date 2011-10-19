@@ -18,15 +18,35 @@
 
 include_recipe "java"
 
-package "httpd-tools"
-
-package "go-server" do
-  case node[:platform]
-    when "centos","redhat","fedora"
-      source "http://download01.thoughtworks.com/go/2.3.1/ga/go-server-2.3.1-14065.noarch.rpm"
-    else
-      source "http://download01.thoughtworks.com/go/2.3.1/ga/go-server-2.3.1-14065.deb"
-    end
+case node[:platform]
+when "centos","redhat","fedora"
+  package_name = "go-server-2.3.1-14065.noarch.rpm"
+  go_download = "/tmp/#{package_name}"
+  remote_file go_download do
+    source "http://download01.thoughtworks.com/go/2.3.1/ga/#{package_name}"
+    mode "0644"
+    owner "#{ENV['USER']}"
+    group "#{ENV['USER']}"
+    not_if "test -f #{go_download}"
+  end
+  
+  execute "go install" do
+    command "yum -d0 -e0 -y localinstall #{go_download} --nogpgcheck"
+  end
+else
+  package_name = "go-server-2.3.1-14065.deb"
+  go_download = "/tmp/#{package_name}"
+  remote_file go_download do
+    source "http://download01.thoughtworks.com/go/2.3.1/ga/#{package_name}"
+    mode "0644"
+    owner "#{ENV['USER']}"
+    group "#{ENV['USER']}"
+    not_if "test -f #{go_download}"
+  end
+  
+  package "go" do
+    source "#{go_download}"
+  end
 end
 
 # create the artifacts directory
