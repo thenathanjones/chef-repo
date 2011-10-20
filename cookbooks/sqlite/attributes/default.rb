@@ -1,0 +1,1 @@
+default[:sqlite][:version] = "3070800"

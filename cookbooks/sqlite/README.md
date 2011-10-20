@@ -1,16 +1,11 @@
 DESCRIPTION
 ====
 
-Installs nginx and Unicorn and preconfigures the environment to deploy to
+Installs SQLite from source
 
 REQUIREMENTS
 ====
 
-Cookbooks
-----
-
-* nginx
-* unicorn
 
 Platform
 ----

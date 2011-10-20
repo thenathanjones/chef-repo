@@ -17,8 +17,9 @@
 #
 
 include_recipe "java"
+include_recipe "sqlite"
 
-required_packages = ["git-core", "sqlite-devel"]
+required_packages = ["git-core"]
 required_packages.each do |p|
   package "#{p}"
 end

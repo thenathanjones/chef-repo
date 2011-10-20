@@ -13,10 +13,6 @@ define :template_go_config, :action => :install do
     source "license.xml.erb"
   end
   
-  template "/tmp/pipelines.xml" do
-    source "pipelines.xml.erb"
-  end
-  
   ruby_block "update Go config" do
     block do
       GoHelper.template_config params[:config]
@@ -33,7 +29,7 @@ class GoHelper
     filename = "/etc/go/cruise-config.xml"
     input = Nokogiri::XML(File.new(filename))
 
-    input.root['schemaVersion'] = '41'
+    input.root['schemaVersion'] = (input.root['schemaVersion'].to_i + 1).to_s
 
     server_section = input.root.xpath("//server")
     if (!server_section.any?) 
@@ -49,13 +45,6 @@ class GoHelper
       new_license_section = Nokogiri::XML(File.new("/tmp/license.xml"))
       input.root.xpath("//server").first.add_child new_license_section.root
     end
-
-    pipelines_section = input.root.xpath("//pipelines")
-    if (pipelines_section.any?) 
-      pipelines_section.remove
-    end
-    pipelines_section = Nokogiri::XML(File.new("/tmp/pipelines.xml"))
-    input.root.add_child pipelines_section.root
 
     File.open(filename, 'w') {|f| f.write(input.to_xml) }
   end
