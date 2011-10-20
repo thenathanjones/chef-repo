@@ -18,6 +18,8 @@
 
 include_recipe "java"
 
+package "git-core"
+
 case node[:platform]
 when "centos","redhat","fedora"
   package_name = "go-server-2.3.1-14065.noarch.rpm"

@@ -18,6 +18,8 @@
 
 include_recipe "java"
 
+package "git-core"
+
 case node[:platform]
 when "centos","redhat","fedora"
   package_name = "go-agent-2.3.1-14065.noarch.rpm"
@@ -55,6 +57,59 @@ template "/etc/default/go-agent" do
   owner "go"
   group "go"
   mode "0644"
+end
+
+bash "install ruby-build" do
+  code <<-EOH
+  git clone git://github.com/sstephenson/ruby-build.git /tmp/ruby-build
+  cd /tmp/ruby-build
+  ./install.sh
+  EOH
+end
+
+bash "install rbenv" do
+  user "go"
+  code <<-EOH
+  git clone git://github.com/sstephenson/rbenv.git /var/go/.rbenv
+  EOH
+  not_if "test -d /var/go/.rbenv"
+end
+
+# add rbenv to the servers .bashrc file
+template "/var/go/.bashrc" do
+  source "agent-bashrc.erb"
+  owner "go"
+  group "go"
+  mode "0644"
+end
+
+ruby_version = "#{node[:ruby][:version]}-#{node[:ruby][:patch_level]}"
+bash "install ruby version - #{ruby_version}" do
+  user "go"
+  code <<-EOH
+  export HOME=/var/go
+  source /var/go/.bashrc
+  rbenv install #{ruby_version}
+  rbenv rehash
+  rbenv global #{ruby_version}
+  EOH
+end
+
+# install bundler and let the agents deal with their own gems
+bash "install bundler" do
+  user "go"
+  code <<-EOH
+  export HOME=/var/go
+  source /var/go/.bashrc
+  gem install bundler --no-rdoc --no-ri
+  EOH
+end
+
+bash "creating SSH key" do
+  user "go"
+  code <<-EOH
+  ssh-keygen -N '' -f /var/go/.ssh/id_rsa -t rsa -q
+  EOH
 end
 
 service "go-agent" do

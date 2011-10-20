@@ -1,2 +1,33 @@
-<pipelines>
-</pipelines>
+<pipelines group="GAIA">
+    <pipeline name="Trunk">
+      <materials>
+        <git url="git@github.com:thenathanjones/gaia.git" />
+      </materials>
+      <stage name="spec">
+        <jobs>
+          <job name="spec">
+            <environmentvariables>
+              <variable name="BUNDLE_WITHOUT">production:prototype</variable>
+            </environmentvariables>
+            <tasks>
+              <exec command="bundle">
+                <arg>install</arg>
+              </exec>
+              <exec command="bundle">
+                <arg>exec</arg>
+                <arg>rake</arg>
+                <arg>db:rebuild</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="bundle">
+                <arg>exec</arg>
+                <arg>rake</arg>
+                <arg>spec</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+  </pipelines>

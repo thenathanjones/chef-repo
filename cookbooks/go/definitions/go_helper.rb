@@ -6,6 +6,7 @@ define :template_go_config, :action => :install do
   end
     
   gem_package "nokogiri"
+  # this is required for Chef to include the new gem
   Gem.clear_paths
   
   template "/tmp/license.xml" do
@@ -31,6 +32,8 @@ class GoHelper
     
     filename = "/etc/go/cruise-config.xml"
     input = Nokogiri::XML(File.new(filename))
+
+    input.root['schemaVersion'] = '41'
 
     server_section = input.root.xpath("//server")
     if (!server_section.any?) 
