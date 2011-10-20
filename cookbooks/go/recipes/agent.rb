@@ -18,7 +18,10 @@
 
 include_recipe "java"
 
-package "git-core"
+required_packages = ["git-core", "sqlite-devel"]
+required_packages.each do |p|
+  package "#{p}"
+end
 
 case node[:platform]
 when "centos","redhat","fedora"
