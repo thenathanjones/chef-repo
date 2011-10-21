@@ -29,10 +29,9 @@ class GoHelper
     filename = "/etc/go/cruise-config.xml"
     input = Nokogiri::XML(File.new(filename))
 
-    input.root['schemaVersion'] = (input.root['schemaVersion'].to_i + 1).to_s
-
     server_section = input.root.xpath("//server")
     if (!server_section.any?) 
+      input.root['schemaVersion'] = '41'
       input.root.add_child("<server artifactsdir=\"artifacts\"></server>")
     end
       

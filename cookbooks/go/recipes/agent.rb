@@ -19,6 +19,8 @@
 include_recipe "java"
 include_recipe "sqlite"
 
+go_user_home = "/var/go"
+
 required_packages = ["git-core"]
 required_packages.each do |p|
   package "#{p}"
@@ -74,13 +76,13 @@ end
 bash "install rbenv" do
   user "go"
   code <<-EOH
-  git clone git://github.com/sstephenson/rbenv.git /var/go/.rbenv
+  git clone git://github.com/sstephenson/rbenv.git #{go_user_home}/.rbenv
   EOH
   not_if "test -d /var/go/.rbenv"
 end
 
 # add rbenv to the servers .bashrc file
-template "/var/go/.bashrc" do
+template "#{go_user_home}/.bashrc" do
   source "agent-bashrc.erb"
   owner "go"
   group "go"
@@ -91,29 +93,32 @@ ruby_version = "#{node[:ruby][:version]}-#{node[:ruby][:patch_level]}"
 bash "install ruby version - #{ruby_version}" do
   user "go"
   code <<-EOH
-  export HOME=/var/go
-  source /var/go/.bashrc
+  export HOME=#{go_user_home}
+  source #{go_user_home}/.bashrc
   rbenv install #{ruby_version}
   rbenv rehash
   rbenv global #{ruby_version}
   EOH
+  not_if "ruby -v | grep \"#{node[:ruby][:version]}\" | grep \"#{node[:ruby][:patch_level]}\""
 end
 
 # install bundler and let the agents deal with their own gems
 bash "install bundler" do
   user "go"
   code <<-EOH
-  export HOME=/var/go
-  source /var/go/.bashrc
+  export HOME=#{go_user_home}
+  source #{go_user_home}/.bashrc
   gem install bundler --no-rdoc --no-ri
   EOH
 end
 
+key_path = "#{go_user_home}/.ssh/id_rsa"
 bash "creating SSH key" do
   user "go"
   code <<-EOH
-  ssh-keygen -N '' -f /var/go/.ssh/id_rsa -t rsa -q
+  ssh-keygen -N '' -f #{key_path} -t rsa -q
   EOH
+  not_if "test -f #{key_path}"
 end
 
 service "go-agent" do

@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: sqlite
+# Cookbook Name:: mingle
 # Recipe:: default
 # Author:: Nathan Jones (thenathanjones@gmail.com)
 #
@@ -16,18 +16,4 @@
 # limitations under the License.
 #
 
-sqlite_version = "3070800"
-sqlite_package_name = "sqlite-autoconf-#{sqlite_version}"
-file_name = "#{sqlite_package_name}.tar.gz"
-bash "install SQLite" do
-  code <<-EOH
-  cd /usr/local/src/
-  wget http://www.sqlite.org/#{file_name}
-  tar xzvf #{file_name}
-  cd #{sqlite_package_name}
-  ./configure
-  make
-  make install
-  EOH
-  not_if "test -d /usr/local/src/#{sqlite_package_name}"
-end
+include_recipe "postgres::server"
